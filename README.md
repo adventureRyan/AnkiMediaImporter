@@ -3,21 +3,23 @@ media-import-2
 
 Anki add-on for importing media files as new notes.
 
-[Link to add-on](https://ankiweb.net/shared/info/1531997860)
+[Link to add-on](https://ankiweb.net/shared/info/129299120)
+
+This add-on is an updated version of the [Media Import](https://ankiweb.net/shared/info/1531997860) add-on, which is no longer being maintained.
 
 ---
 
 This add-on will allow you to import media files into your Anki collection and use their file names as a component of the note. You can create cards that might look like this (using *apple.jpg*):
 
-![Card](https://raw.githubusercontent.com/hssm/media-import/master/docs/card.png)
+![Card](https://raw.githubusercontent.com/Iksas/media-import-2/master/docs/card.png)
 
 When the add-on is installed, a `Media Import 2...` option will be added to the `Tools` menu.
 
-![Menu](https://raw.githubusercontent.com/hssm/media-import/master/docs/menu.png)
+![Menu](https://raw.githubusercontent.com/Iksas/media-import-2/master/docs/menu.png)
 
 Selecting this menu item will open the Media Import window.
 
-![Dialog](https://raw.githubusercontent.com/hssm/media-import/master/docs/dialog.png)
+![Dialog](https://raw.githubusercontent.com/Iksas/media-import-2/master/docs/dialog.png)
 
 From this window, you are able to:
 - Browse and select which folder to use as the source of media files
@@ -36,4 +38,4 @@ Here is a list of the content available to insert into fields. We will use an ex
 
 All new generated cards are added to a deck named `MediaImport`. This deck is created for you automatically if it doesn't exist.
 
-![Complete](https://raw.githubusercontent.com/hssm/media-import/master/docs/complete.png)
+![Complete](https://raw.githubusercontent.com/Iksas/media-import-2/master/docs/complete.png)
