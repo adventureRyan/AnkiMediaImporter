@@ -68,7 +68,7 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Media Import"))
+        Form.setWindowTitle(_translate("Form", "Media Import 2"))
         self.label_3.setText(_translate("Form", "Media directory: "))
         self.browse.setText(_translate("Form", "Browse"))
         self.label_2.setText(_translate("Form", "Map fields"))

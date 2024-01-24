@@ -245,7 +245,7 @@ note type you selected is able to generate cards by using a valid
 </p>
 """)
 
-action = QAction("Media Import...", mw)
+action = QAction("Media Import 2...", mw)
 action.triggered.connect(doMediaImport)
 mw.form.menuTools.addAction(action)
 

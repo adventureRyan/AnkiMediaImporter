@@ -1,4 +1,4 @@
-media-import
+media-import-2
 ============
 
 Anki add-on for importing media files as new notes.
@@ -11,7 +11,7 @@ This add-on will allow you to import media files into your Anki collection and u
 
 ![Card](https://raw.githubusercontent.com/hssm/media-import/master/docs/card.png)
 
-When the add-on is installed, a `Media Import...` option will be added to the `Tools` menu.
+When the add-on is installed, a `Media Import 2...` option will be added to the `Tools` menu.
 
 ![Menu](https://raw.githubusercontent.com/hssm/media-import/master/docs/menu.png)
 
