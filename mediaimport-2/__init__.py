@@ -47,7 +47,7 @@ def doMediaImport():
     failure = False
     for i, fileName in enumerate(files):
         note = notes.Note(mw.col, model)
-        note.model()['did'] = did
+        note.note_type()['did'] = did
         mediaName, ext = os.path.splitext(fileName)
         ext = ext[1:].lower()
         path = os.path.join(root, fileName)
@@ -55,7 +55,7 @@ def doMediaImport():
             # Skip files with no extension and non-media files
             continue
         # Add the file to the media collection and get its name
-        fname = mw.col.media.addFile(path)
+        fname = mw.col.media.add_file(path)
         # Now we populate each field according to the mapping selected
         for (field, actionIdx, special) in fieldList:
             action = ACTIONS[actionIdx]
