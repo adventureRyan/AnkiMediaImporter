@@ -5,10 +5,12 @@
 # user-selected directory. The user is able to map properties of the imported
 # file to fields in a note type. For example, a user can map the media file
 # to the 'Front' field and the file name to the 'Back' field and generate new
-# cards from a folder of media files following this pattern.
+# cards from a folder of media files following this pattern. It can create
+# decks recursively and with a hierarchial tag structure
 #
 # See github page to report issues or to contribute:
 # https://github.com/hssm/media-import
+import os
 
 from aqt import mw
 from aqt.qt import *
@@ -21,16 +23,19 @@ from . import dialog
 AUDIO = editor.audio
 IMAGE = editor.pics
 # Possible field mappings
-ACTIONS = ['',
-           'Media',
-           'File Name',
-           'File Name (full)',
-           'Extension',
-           'Extension-1',
-           'Sequence']
+ACTIONS = [
+    "",
+    "Media",
+    "File Name",
+    "File Name (full)",
+    "Extension",
+    "Extension-1",
+    "Sequence",
+    "HierarchicalTags",
+]
 
 # Note items that we can import into that are not note fields
-SPECIAL_FIELDS = ['Tags']
+SPECIAL_FIELDS = ["Tags"]
 
 
 def doMediaImport():
@@ -39,56 +44,66 @@ def doMediaImport():
     if not ok:
         return
     # Get the MediaImport deck id (auto-created if it doesn't exist)
-    did = mw.col.decks.id('MediaImport')
-    # We won't walk the path - we only want the top-level files.
-    (root, dirs, files) = next(os.walk(path))
-    mw.progress.start(max=len(files), parent=mw, immediate=True)
+    did = mw.col.decks.id("MediaImport")
+
+    # Walk through the entire directory tree
     newCount = 0
     failure = False
-    for i, fileName in enumerate(files):
-        note = notes.Note(mw.col, model)
-        note.model()['did'] = did
-        mediaName, ext = os.path.splitext(fileName)
-        ext = ext[1:].lower()
-        path = os.path.join(root, fileName)
-        if ext is None or ext not in AUDIO+IMAGE:
-            # Skip files with no extension and non-media files
-            continue
-        # Add the file to the media collection and get its name
-        fname = mw.col.media.addFile(path)
-        # Now we populate each field according to the mapping selected
-        for (field, actionIdx, special) in fieldList:
-            action = ACTIONS[actionIdx]
-            if action == '':
+    fileCount = sum([len(files) for _, _, files in os.walk(path)])
+    mw.progress.start(max=fileCount, parent=mw, immediate=True)
+
+    for root, dirs, files in os.walk(path):
+        for i, fileName in enumerate(files):
+            note = notes.Note(mw.col, model)
+            note.note_type()["did"] = did
+            mediaName, ext = os.path.splitext(fileName)
+            ext = ext[1:].lower()
+            filePath = os.path.join(root, fileName)
+            if ext is None or ext not in AUDIO + IMAGE:
+                # Skip files with no extension and non-media files
                 continue
-            elif action == "Media":
-                if ext in AUDIO:
-                     data = u'[sound:%s]' % fname
-                elif ext in IMAGE:
-                     data = u'<img src="%s">' % fname
-            elif action == "File Name":
-                data = mediaName
-            elif action == "File Name (full)":
-                data = fileName
-            elif action == "Extension":
-                data = ext
-            elif action == 'Extension-1':
-                data = os.path.splitext(mediaName)[1][1:]
-            elif action == "Sequence":
-                data = str(i)
+            # Add the file to the media collection and get its name
+            fname = mw.col.media.add_file(filePath)
+            # Now we populate each field according to the mapping selected
+            for field, actionIdx, special in fieldList:
+                action = ACTIONS[actionIdx]
+                if action == "":
+                    continue
+                elif action == "Media":
+                    if ext in AUDIO:
+                        data = "[sound:%s]" % fname
+                    elif ext in IMAGE:
+                        data = '<img src="%s">' % fname
+                elif action == "File Name":
+                    data = mediaName
+                elif action == "File Name (full)":
+                    data = fileName
+                elif action == "Extension":
+                    data = ext
+                elif action == "Extension-1":
+                    data = os.path.splitext(mediaName)[1][1:]
+                elif action == "Sequence":
+                    data = str(i)
+                elif action == "HierarchicalTags":
+                    relative_path = os.path.relpath(root, path)
+                    tag_with_spaces = "::".join(relative_path.split(os.sep))
+                    data = tag_with_spaces.replace(" ", "_")
+                    note.tags.append(data)
+                if special and field == "Tags":
+                    note.tags.append(data)
+                else:
+                    note[field] = data
 
-            if special and field == "Tags":
-                note.tags.append(data)
-            else:
-                note[field] = data
-
-        if not mw.col.addNote(note):
-            # No cards were generated - probably bad template. No point
-            # trying to import anymore.
-            failure = True
+            if not mw.col.addNote(note):
+                # No cards were generated - probably bad template. No point
+                # trying to import anymore.
+                failure = True
+                break
+            newCount += 1
+            mw.progress.update(value=newCount)
+        if failure:
             break
-        newCount += 1
-        mw.progress.update(value=i)
+
     mw.progress.finish()
     mw.deckBrowser.refresh()
     if failure:
@@ -119,7 +134,7 @@ class ImportSettingsDialog(QDialog):
         """Fill in the list of available note types to select from."""
         models = mw.col.models.all()
         for m in models:
-            item = QListWidgetItem(m['name'])
+            item = QListWidgetItem(m["name"])
             # Put the model in the widget to conveniently fetch later
             item.model = m
             self.form.modelList.addItem(item)
@@ -140,20 +155,25 @@ class ImportSettingsDialog(QDialog):
         self.clearLayout(self.form.fieldMapGrid)
         # Add note fields to grid
         row = 0
-        for field in self.form.modelList.currentItem().model['flds']:
-            self.createRow(field['name'], row)
-            row += 1
-        # Add special fields to grid
+        for field in self.form.modelList.currentItem().model["flds"]:
+            self.createRow(field["name"], row)
+            row += 1  # Add special fields to grid
         for name in SPECIAL_FIELDS:
             self.createRow(name, row, special=True)
             row += 1
         self.fieldCount = row
         try:
             self.form.fieldMapGrid.addItem(
-                QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding), row, 0)
+                QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding), row, 0
+            )
         except AttributeError:
             self.form.fieldMapGrid.addItem(
-                QSpacerItem(0, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding), row, 0)
+                QSpacerItem(
+                    0, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding
+                ),
+                row,
+                0,
+            )
 
     def createRow(self, name, idx, special=False):
         lbl = QLabel(name)
@@ -163,8 +183,10 @@ class ImportSettingsDialog(QDialog):
         lbl.special = special
         self.form.fieldMapGrid.addWidget(lbl, idx, 0)
         self.form.fieldMapGrid.addWidget(cmb, idx, 1)
-        if idx == 0: cmb.setCurrentIndex(1)
-        if idx == 1: cmb.setCurrentIndex(2)
+        if idx == 0:
+            cmb.setCurrentIndex(1)
+        if idx == 1:
+            cmb.setCurrentIndex(2)
 
     def getDialogResult(self):
         """Return a tuple containing the user-defined settings to follow
@@ -224,28 +246,36 @@ class ImportSettingsDialog(QDialog):
 
 
 def showCompletionDialog(newCount):
-    QMessageBox.about(mw, "Media Import Complete",
-"""
+    QMessageBox.about(
+        mw,
+        "Media Import Complete",
+        """
 <p>
-Media import is complete and %s new notes were created. 
+Media import is complete and %s new notes were created.
 All generated cards are placed in the <b>MediaImport</b> deck.
 <br><br>
-Please refer to the introductory videos for instructions on 
-<a href="https://youtube.com/watch?v=DnbKwHEQ1mA">flipping card content</a> or 
+Please refer to the introductory videos for instructions on
+<a href="https://youtube.com/watch?v=DnbKwHEQ1mA">flipping card content</a> or
 <a href="http://youtube.com/watch?v=F1j1Zx0mXME">modifying the appearance of cards.</a>
-</p>""" % newCount)
+</p>"""
+        % newCount,
+    )
+
 
 def showFailureDialog():
-    QMessageBox.about(mw, "Media Import Failure",
-"""
+    QMessageBox.about(
+        mw,
+        "Media Import Failure",
+        """
 <p>
 Failed to generate cards and no media files were imported. Please ensure the
 note type you selected is able to generate cards by using a valid
 <a href="http://ankisrs.net/docs/manual.html#cards-and-templates">card template</a>.
 </p>
-""")
+""",
+    )
+
 
 action = QAction("Media Import 2...", mw)
 action.triggered.connect(doMediaImport)
 mw.form.menuTools.addAction(action)
-
