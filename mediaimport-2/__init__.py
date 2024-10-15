@@ -11,9 +11,11 @@
 # See GitHub page to report issues or to contribute:
 # https://github.com/Iksas/media-import-2
 
-from aqt import mw
+import time
+
+from aqt import editor, mw
+from aqt.utils import tooltip
 from aqt.qt import *
-from aqt import editor
 from anki import notes
 
 from . import dialog
@@ -39,9 +41,11 @@ SPECIAL_FIELDS = ["Tags"]
 
 def doMediaImport():
     # Raise the main dialog for the add-on and retrieve its result when closed.
-    (path, model, fieldList, ok) = ImportSettingsDialog().getDialogResult()
+    (path, recursive, model, fieldList, ok) = ImportSettingsDialog().getDialogResult()
     if not ok:
         return
+
+    start_time = time.monotonic()
     # Get the MediaImport deck id (auto-created if it doesn't exist)
     did = mw.col.decks.id("MediaImport")
 
@@ -52,6 +56,10 @@ def doMediaImport():
     mw.progress.start(max=fileCount, parent=mw, immediate=True)
 
     for root, dirs, files in os.walk(path):
+        # Don't import subdirectories if the user disabled them
+        if not recursive:
+            dirs[:] = []
+
         for i, fileName in enumerate(files):
             note = notes.Note(mw.col, model)
             note.note_type()["did"] = did
@@ -109,6 +117,8 @@ def doMediaImport():
             break
 
     mw.progress.finish()
+    end_time = time.monotonic()
+    tooltip(f"Created {newCount} cards in {end_time - start_time:.2f} seconds.")
     mw.deckBrowser.refresh()
     if failure:
         showFailureDialog()
@@ -124,8 +134,10 @@ class ImportSettingsDialog(QDialog):
         self.form.buttonBox.accepted.connect(self.accept)
         self.form.buttonBox.rejected.connect(self.reject)
         self.form.browse.clicked.connect(self.onBrowse)
+        self.form.recursiveCheckbox.clicked.connect(self.recursiveCheckboxClicked)
         # The path to the media directory chosen by user
         self.mediaDir = None
+        self.recursive = True
         # The number of fields in the note type we are using
         self.fieldCount = 0
         self.populateModelList()
@@ -207,10 +219,10 @@ class ImportSettingsDialog(QDialog):
 
         try:
             if self.result() == QDialog.Rejected:
-                return None, None, None, False
+                return None, False, None, None, False
         except AttributeError:
             if self.result() == QDialog.DialogCode.Rejected:
-                return None, None, None, False
+                return None, False, None, None, False
 
         model = self.form.modelList.currentItem().model
         # Iterate the grid rows to populate the field map
@@ -224,7 +236,7 @@ class ImportSettingsDialog(QDialog):
             # QComboBox with index from the action list
             actionIdx = grid.itemAtPosition(row, 1).widget().currentIndex()
             fieldList.append((field, actionIdx, special))
-        return self.mediaDir, model, fieldList, True
+        return self.mediaDir, self.recursive, model, fieldList, True
 
     def onBrowse(self):
         """Show the directory selection dialog."""
@@ -234,6 +246,9 @@ class ImportSettingsDialog(QDialog):
         self.mediaDir = path
         self.form.mediaDir.setText(self.mediaDir)
         self.form.mediaDir.setStyleSheet("")
+
+    def recursiveCheckboxClicked(self, value: bool):
+        self.recursive = value
 
     def accept(self):
         # Show a red warning box if the user tries to import without selecting

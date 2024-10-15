@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'dialog.ui'
+# Version: 3.1
 #
-# Created by: PyQt5 UI code generator 5.6
+# This is an Anki add-on for creating notes by importing media files from a
+# user-selected directory. The user is able to map properties of the imported
+# file to fields in a note type. For example, a user can map the media file
+# to the 'Front' field and the file name to the 'Back' field and generate new
+# cards from a folder of media files following this pattern. It can create
+# decks recursively and with a hierarchical tag structure.
 #
-# WARNING! All changes made in this file will be lost!
+# See GitHub page to report issues or to contribute:
+# https://github.com/Iksas/media-import-2
 
 try:
     from PyQt5 import QtCore, QtGui, QtWidgets
@@ -18,19 +23,25 @@ class Ui_Form(object):
         Form.resize(604, 353)
         self.verticalLayout = QtWidgets.QVBoxLayout(Form)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.topGridLayout = QtWidgets.QGridLayout()
+        self.topGridLayout.setObjectName("topGridLayout")
         self.label_3 = QtWidgets.QLabel(Form)
         self.label_3.setObjectName("label_3")
-        self.horizontalLayout_2.addWidget(self.label_3)
+        self.topGridLayout.addWidget(self.label_3, 0, 0)
         self.mediaDir = QtWidgets.QLineEdit(Form)
         self.mediaDir.setEnabled(False)
         self.mediaDir.setObjectName("mediaDir")
-        self.horizontalLayout_2.addWidget(self.mediaDir)
+        self.topGridLayout.addWidget(self.mediaDir, 0, 1)
         self.browse = QtWidgets.QPushButton(Form)
         self.browse.setObjectName("browse")
-        self.horizontalLayout_2.addWidget(self.browse)
-        self.verticalLayout.addLayout(self.horizontalLayout_2)
+        self.topGridLayout.addWidget(self.browse, 0, 2)
+        self.subDirLabel = QtWidgets.QLabel("Subdirectories:")
+        self.topGridLayout.addWidget(self.subDirLabel, 1, 0)
+        self.recursiveCheckbox = QtWidgets.QCheckBox()
+        self.recursiveCheckbox.setChecked(True)
+        self.recursiveCheckbox.setObjectName("recursive")
+        self.topGridLayout.addWidget(self.recursiveCheckbox, 1, 1)
+        self.verticalLayout.addLayout(self.topGridLayout)
 
         try:
             spacerItem = QtWidgets.QSpacerItem(0, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
