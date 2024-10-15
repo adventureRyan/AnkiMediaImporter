@@ -18,11 +18,17 @@ from aqt.utils import tooltip
 from aqt.qt import *
 from anki import notes
 
+try:
+    from PyQt5 import QtCore
+except ModuleNotFoundError:
+    from PyQt6 import QtCore
+
 from . import dialog
 
 # Support the same media types as the Editor
 AUDIO = editor.audio
 IMAGE = editor.pics
+
 # Possible field mappings
 ACTIONS = [
     "",
@@ -32,8 +38,23 @@ ACTIONS = [
     "Extension",
     "Extension-1",
     "Sequence",
-    "HierarchicalTags",
+    "Folder tags",
+    "Folder tags (hierarchical)"
 ]
+
+# Tooltips for the dropdown menu
+# TODO: Don't use string literals as keys
+ACTION_TOOLTIPS = {
+    "": "Nothing",
+    "Media": "The media file\n(image / audio etc.)",
+    "File Name": 'The file name without extension\n(e.g. "image.JPG" -> "image")',
+    "File Name (full)": 'The file name with extension\n(e.g. "image.JPG" -> "image.JPG")',
+    "Extension": 'The lower-case file extension\n(e.g. "image.JPG" -> "jpg")',
+    "Extension-1": 'The file extension\n(e.g. "image.JPG" -> "JPG")',
+    "Sequence": 'An increasing number\n("0", "1", "2", ...)',
+    "Folder tags": 'Creates one tag for each subfolder\n(e.g. "f1/f2/f3/image.JPG" -> [f1] [f2] [f3])',
+    "Folder tags (hierarchical)": 'Creates a single tag from the subfolder path\n(e.g. "f1/f2/f3/image.JPG" -> [f1::f2::f3])',
+}
 
 # Note items that we can import into that are not note fields
 SPECIAL_FIELDS = ["Tags"]
@@ -93,17 +114,28 @@ def doMediaImport():
                     data = os.path.splitext(mediaName)[1][1:]
                 elif fieldAction == "Sequence":
                     data = str(i)
-                elif fieldAction == "HierarchicalTags":
+                elif fieldAction == "Folder tags":
                     relative_path = os.path.relpath(root, path)
-                    tag_with_spaces = "::".join(relative_path.split(os.sep))
-                    data = tag_with_spaces.replace(" ", "_")
-                    note.tags.append(data)
+                    data = relative_path.split(os.sep)
+                    if "." in data:
+                        data.remove(".")
+                elif fieldAction == "Folder tags (hierarchical)":
+                    relative_path = os.path.relpath(root, path)
+                    data = relative_path.split(os.sep)
+                    if "." in data:
+                        data.remove(".")
+                    data = "::".join(data).replace(" ", "_")
                 else:
                     continue
 
                 if special and field == "Tags":
-                    note.tags.append(data)
+                    if type(data) is not list:
+                        data = [data]
+                    for tag in data:
+                        note.tags.append(tag)
                 else:
+                    if type(data) is list:
+                        data = " ".join(data)
                     note[field] = data
 
             if not mw.col.addNote(note):
@@ -198,7 +230,13 @@ class ImportSettingsDialog(QDialog):
     def createRow(self, name, idx, special=False):
         lbl = QLabel(name)
         cmb = QComboBox(None)
-        cmb.addItems(ACTIONS)
+
+        # Add the actions to the dropdown menu, and add tooltips
+        for i, actionText in enumerate(ACTIONS):
+            cmb.addItem(actionText)
+            if actionText in ACTION_TOOLTIPS:
+                cmb.setItemData(i, ACTION_TOOLTIPS[actionText], QtCore.Qt.ItemDataRole.ToolTipRole)
+
         # piggyback the special flag on QLabel
         lbl.special = special
         self.form.fieldMapGrid.addWidget(lbl, idx, 0)
