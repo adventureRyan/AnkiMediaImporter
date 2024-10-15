@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
-# Version: 2.5
+# Version: 3.1
 #
 # This is an Anki add-on for creating notes by importing media files from a
 # user-selected directory. The user is able to map properties of the imported
 # file to fields in a note type. For example, a user can map the media file
 # to the 'Front' field and the file name to the 'Back' field and generate new
 # cards from a folder of media files following this pattern. It can create
-# decks recursively and with a hierarchial tag structure
+# decks recursively and with a hierarchical tag structure.
 #
-# See github page to report issues or to contribute:
-# https://github.com/hssm/media-import
-import os
+# See GitHub page to report issues or to contribute:
+# https://github.com/Iksas/media-import-2
 
 from aqt import mw
 from aqt.qt import *
@@ -63,40 +62,45 @@ def doMediaImport():
                 # Skip files with no extension and non-media files
                 continue
             # Add the file to the media collection and get its name
-            fname = mw.col.media.add_file(filePath)
+            internalFileName = mw.col.media.add_file(filePath)
             # Now we populate each field according to the mapping selected
             for field, actionIdx, special in fieldList:
-                action = ACTIONS[actionIdx]
-                if action == "":
+                fieldAction = ACTIONS[actionIdx]
+                if fieldAction == "":
                     continue
-                elif action == "Media":
+                elif fieldAction == "Media":
                     if ext in AUDIO:
-                        data = "[sound:%s]" % fname
+                        data = "[sound:%s]" % internalFileName
                     elif ext in IMAGE:
-                        data = '<img src="%s">' % fname
-                elif action == "File Name":
+                        data = '<img src="%s">' % internalFileName
+                    else:
+                        continue
+                elif fieldAction == "File Name":
                     data = mediaName
-                elif action == "File Name (full)":
+                elif fieldAction == "File Name (full)":
                     data = fileName
-                elif action == "Extension":
+                elif fieldAction == "Extension":
                     data = ext
-                elif action == "Extension-1":
+                elif fieldAction == "Extension-1":
                     data = os.path.splitext(mediaName)[1][1:]
-                elif action == "Sequence":
+                elif fieldAction == "Sequence":
                     data = str(i)
-                elif action == "HierarchicalTags":
+                elif fieldAction == "HierarchicalTags":
                     relative_path = os.path.relpath(root, path)
                     tag_with_spaces = "::".join(relative_path.split(os.sep))
                     data = tag_with_spaces.replace(" ", "_")
                     note.tags.append(data)
+                else:
+                    continue
+
                 if special and field == "Tags":
                     note.tags.append(data)
                 else:
                     note[field] = data
 
             if not mw.col.addNote(note):
-                # No cards were generated - probably bad template. No point
-                # trying to import anymore.
+                # No cards were generated - probably bad template.
+                # No point trying to import anymore.
                 failure = True
                 break
             newCount += 1
@@ -153,14 +157,18 @@ class ImportSettingsDialog(QDialog):
         special cases for rows 0 and 1. The final row is a spacer."""
 
         self.clearLayout(self.form.fieldMapGrid)
+
         # Add note fields to grid
         row = 0
         for field in self.form.modelList.currentItem().model["flds"]:
             self.createRow(field["name"], row)
-            row += 1  # Add special fields to grid
+            row += 1
+
+        # Add special fields to grid
         for name in SPECIAL_FIELDS:
             self.createRow(name, row, special=True)
             row += 1
+
         self.fieldCount = row
         try:
             self.form.fieldMapGrid.addItem(
@@ -177,9 +185,9 @@ class ImportSettingsDialog(QDialog):
 
     def createRow(self, name, idx, special=False):
         lbl = QLabel(name)
-        cmb = QComboBox()
+        cmb = QComboBox(None)
         cmb.addItems(ACTIONS)
-        # piggy-back the special flag on QLabel
+        # piggyback the special flag on QLabel
         lbl.special = special
         self.form.fieldMapGrid.addWidget(lbl, idx, 0)
         self.form.fieldMapGrid.addWidget(cmb, idx, 1)
@@ -211,7 +219,7 @@ class ImportSettingsDialog(QDialog):
         for row in range(self.fieldCount):
             # QLabel with field name
             field = grid.itemAtPosition(row, 0).widget().text()
-            # Piggy-backed special flag
+            # Piggybacked special flag
             special = grid.itemAtPosition(row, 0).widget().special
             # QComboBox with index from the action list
             actionIdx = grid.itemAtPosition(row, 1).widget().currentIndex()
@@ -277,5 +285,5 @@ note type you selected is able to generate cards by using a valid
 
 
 action = QAction("Media Import 2...", mw)
-action.triggered.connect(doMediaImport)
+action.triggered.connect(doMediaImport)  # noqa
 mw.form.menuTools.addAction(action)
