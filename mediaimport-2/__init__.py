@@ -2,7 +2,7 @@
 # Version: 3.1
 #
 # This is an Anki add-on for creating notes by importing media files from a
-# user-selected directory. The user is able to map properties of the imported
+# user-selected folder. The user is able to map properties of the imported
 # file to fields in a note type. For example, a user can map the media file
 # to the 'Front' field and the file name to the 'Back' field and generate new
 # cards from a folder of media files following this pattern. It can create
@@ -38,8 +38,8 @@ ACTIONS = [
     "Extension",
     "Extension (case-sensitive)",
     "Sequence",
-    "Folder tags (individual)",
-    "Folder tags (hierarchical)"
+    "Subfolder tags (individual)",
+    "Subfolder tags (hierarchical)"
 ]
 
 # Tooltips for the dropdown menu
@@ -52,8 +52,8 @@ ACTION_TOOLTIPS = {
     "Extension": 'The lower-case file extension\n(e.g. "image.JPG" -> "jpg")',
     "Extension (case-sensitive)": 'The file extension\n(e.g. "image.JPG" -> "JPG")',
     "Sequence": 'An increasing number\n("0", "1", "2", ...)',
-    "Folder tags (individual)": 'Creates one tag for each subfolder\n(e.g. "./f1/f2/f3/image.JPG" -> [f1] [f2] [f3])',
-    "Folder tags (hierarchical)": 'Creates a single tag from the subfolder path\n(e.g. "./f1/f2/f3/image.JPG" -> [f1::f2::f3])',
+    "Subfolder tags (individual)": 'Creates one tag for each subfolder\n(e.g. "./f1/f2/f3/image.JPG" -> [f1] [f2] [f3])',
+    "Subfolder tags (hierarchical)": 'Creates a single tag from the subfolder path\n(e.g. "./f1/f2/f3/image.JPG" -> [f1::f2::f3])',
 }
 
 # Note items that we can import into that are not note fields
@@ -77,7 +77,7 @@ def doMediaImport():
     mw.progress.start(max=fileCount, parent=mw, immediate=True)
 
     for root, dirs, files in os.walk(path):
-        # Don't import subdirectories if the user disabled them
+        # Don't import subfolders if the user disabled them
         if not recursive:
             dirs[:] = []
 
@@ -114,12 +114,12 @@ def doMediaImport():
                     data = os.path.splitext(mediaName)[1][1:]
                 elif fieldAction == "Sequence":
                     data = str(i)
-                elif fieldAction == "Folder tags (individual)":
+                elif fieldAction == "Subfolder tags (individual)":
                     relative_path = os.path.relpath(root, path)
                     data = relative_path.split(os.sep)
                     if "." in data:
                         data.remove(".")
-                elif fieldAction == "Folder tags (hierarchical)":
+                elif fieldAction == "Subfolder tags (hierarchical)":
                     relative_path = os.path.relpath(root, path)
                     data = relative_path.split(os.sep)
                     if "." in data:
@@ -167,7 +167,7 @@ class ImportSettingsDialog(QDialog):
         self.form.buttonBox.rejected.connect(self.reject)
         self.form.browse.clicked.connect(self.onBrowse)
         self.form.recursiveCheckbox.clicked.connect(self.recursiveCheckboxClicked)
-        # The path to the media directory chosen by user
+        # The path to the media folder chosen by user
         self.mediaDir = None
         self.recursive = True
         # The number of fields in the note type we are using
@@ -249,7 +249,7 @@ class ImportSettingsDialog(QDialog):
     def getDialogResult(self):
         """Return a tuple containing the user-defined settings to follow
         for an import. The tuple contains four items (in order):
-         - Path to chosen media directory
+         - Path to chosen media folder
          - The model (note type) to use for new notes
          - A dictionary that maps each of the fields in the model to an
            integer index from the ACTIONS list
@@ -277,8 +277,8 @@ class ImportSettingsDialog(QDialog):
         return self.mediaDir, self.recursive, model, fieldList, True
 
     def onBrowse(self):
-        """Show the directory selection dialog."""
-        path = QFileDialog.getExistingDirectory(mw, "Import Directory")
+        """Show the file picker."""
+        path = QFileDialog.getExistingDirectory(mw, "Import Folder")
         if not path:
             return
         self.mediaDir = path
@@ -290,7 +290,7 @@ class ImportSettingsDialog(QDialog):
 
     def accept(self):
         # Show a red warning box if the user tries to import without selecting
-        # a directory.
+        # a media folder.
         if not self.mediaDir:
             self.form.mediaDir.setStyleSheet("border: 1px solid red")
             return

@@ -35,13 +35,13 @@ class Ui_Form(object):
         self.browse = QtWidgets.QPushButton(Form)
         self.browse.setObjectName("browse")
         self.topGridLayout.addWidget(self.browse, 0, 2)
-        self.subDirLabel = QtWidgets.QLabel("Subdirectories:")
-        self.subDirLabel.setToolTip("Include subdirectories")
+        self.subDirLabel = QtWidgets.QLabel(Form)
+        self.subDirLabel.setToolTip("Include media files located in subfolders")
         self.topGridLayout.addWidget(self.subDirLabel, 1, 0)
-        self.recursiveCheckbox = QtWidgets.QCheckBox()
+        self.recursiveCheckbox = QtWidgets.QCheckBox(Form)
         self.recursiveCheckbox.setChecked(True)
         self.recursiveCheckbox.setObjectName("recursive")
-        self.recursiveCheckbox.setToolTip("Include subdirectories")
+        self.recursiveCheckbox.setToolTip("Include media files located in subfolders")
         self.topGridLayout.addWidget(self.recursiveCheckbox, 1, 1)
         self.verticalLayout.addLayout(self.topGridLayout)
 
@@ -82,8 +82,9 @@ class Ui_Form(object):
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Media Import 2"))
-        self.label_3.setText(_translate("Form", "Media directory: "))
+        self.label_3.setText(_translate("Form", "Media folder: "))
         self.browse.setText(_translate("Form", "Browse"))
         self.label_2.setText(_translate("Form", "Map fields"))
         self.label.setText(_translate("Form", "Select note type"))
+        self.subDirLabel.setText(_translate("Form", "Include subfolders:"))
 
