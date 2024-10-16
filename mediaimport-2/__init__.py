@@ -39,7 +39,7 @@ ACTIONS = [
     "Extension (case-sensitive)",
     "Sequence",
     "Subfolder tags (individual)",
-    "Subfolder tags (hierarchical)"
+    "Subfolder tag (hierarchical)"
 ]
 
 # Tooltips for the dropdown menu
@@ -53,7 +53,7 @@ ACTION_TOOLTIPS = {
     "Extension (case-sensitive)": 'The file extension\n(e.g. "image.JPG" -> "JPG")',
     "Sequence": 'An increasing number\n("0", "1", "2", ...)',
     "Subfolder tags (individual)": 'Creates one tag for each subfolder\n(e.g. "./f1/f2/f3/image.JPG" -> [f1] [f2] [f3])',
-    "Subfolder tags (hierarchical)": 'Creates a single tag from the subfolder path\n(e.g. "./f1/f2/f3/image.JPG" -> [f1::f2::f3])',
+    "Subfolder tag (hierarchical)": 'Creates a single tag from the subfolder path\n(e.g. "./f1/f2/f3/image.JPG" -> [f1::f2::f3])',
 }
 
 # Note items that we can import into that are not note fields
@@ -95,38 +95,37 @@ def doMediaImport():
             # Add the file to the media collection and get its name
             internalFileName = mw.col.media.add_file(filePath)
             # Now we populate each field according to the mapping selected
-            for field, actionIdx, special in fieldList:
-                fieldAction = ACTIONS[actionIdx]
-                if fieldAction == "":
+            for field, actionText, special in fieldList:
+                if actionText == "":
                     continue
-                elif fieldAction == "Media":
+                elif actionText == "Media":
                     if ext in AUDIO:
                         data = "[sound:%s]" % internalFileName
                     elif ext in IMAGE:
                         data = '<img src="%s">' % internalFileName
                     else:
                         continue
-                elif fieldAction == "File Name":
+                elif actionText == "File Name":
                     data = mediaName
-                elif fieldAction == "File Name (full)":
+                elif actionText == "File Name (full)":
                     data = fileName
-                elif fieldAction == "Extension":
+                elif actionText == "Extension":
                     data = ext
-                elif fieldAction == "Extension (case-sensitive)":
+                elif actionText == "Extension (case-sensitive)":
                     data = os.path.splitext(mediaName)[1][1:]
-                elif fieldAction == "Sequence":
+                elif actionText == "Sequence":
                     data = str(i)
-                elif fieldAction == "Subfolder tags (individual)":
+                elif actionText == "Subfolder tags (individual)":
                     relative_path = os.path.relpath(root, path)
                     data = relative_path.split(os.sep)
                     if "." in data:
                         data.remove(".")
-                elif fieldAction == "Subfolder tags (hierarchical)":
+                elif actionText == "Subfolder tag (hierarchical)":
                     relative_path = os.path.relpath(root, path)
                     data = relative_path.split(os.sep)
                     if "." in data:
                         data.remove(".")
-                    data = "::".join(data).replace(" ", "_")
+                    data = "::".join(data)
                 else:
                     continue
 
@@ -134,7 +133,7 @@ def doMediaImport():
                     if type(data) is not list:
                         data = [data]
                     for tag in data:
-                        note.tags.append(tag)
+                        note.tags.append(tag.replace(" ", "_"))
                 else:
                     if type(data) is list:
                         data = " ".join(data)
@@ -276,9 +275,9 @@ class ImportSettingsDialog(QDialog):
             field = grid.itemAtPosition(row, 0).widget().text()
             # Piggybacked special flag
             special = grid.itemAtPosition(row, 0).widget().special
-            # QComboBox with index from the action list
-            actionIdx = grid.itemAtPosition(row, 1).widget().currentIndex()
-            fieldList.append((field, actionIdx, special))
+            # QComboBox with currently displayed text
+            actionText = grid.itemAtPosition(row, 1).widget().currentText()
+            fieldList.append((field, actionText, special))
         return self.mediaDir, self.recursive, model, fieldList, True
 
     def onBrowse(self):
