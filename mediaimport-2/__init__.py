@@ -36,9 +36,9 @@ ACTIONS = [
     "File Name",
     "File Name (full)",
     "Extension",
-    "Extension-1",
+    "Extension (case-sensitive)",
     "Sequence",
-    "Folder tags",
+    "Folder tags (individual)",
     "Folder tags (hierarchical)"
 ]
 
@@ -50,10 +50,10 @@ ACTION_TOOLTIPS = {
     "File Name": 'The file name without extension\n(e.g. "image.JPG" -> "image")',
     "File Name (full)": 'The file name with extension\n(e.g. "image.JPG" -> "image.JPG")',
     "Extension": 'The lower-case file extension\n(e.g. "image.JPG" -> "jpg")',
-    "Extension-1": 'The file extension\n(e.g. "image.JPG" -> "JPG")',
+    "Extension (case-sensitive)": 'The file extension\n(e.g. "image.JPG" -> "JPG")',
     "Sequence": 'An increasing number\n("0", "1", "2", ...)',
-    "Folder tags": 'Creates one tag for each subfolder\n(e.g. "f1/f2/f3/image.JPG" -> [f1] [f2] [f3])',
-    "Folder tags (hierarchical)": 'Creates a single tag from the subfolder path\n(e.g. "f1/f2/f3/image.JPG" -> [f1::f2::f3])',
+    "Folder tags (individual)": 'Creates one tag for each subfolder\n(e.g. "./f1/f2/f3/image.JPG" -> [f1] [f2] [f3])',
+    "Folder tags (hierarchical)": 'Creates a single tag from the subfolder path\n(e.g. "./f1/f2/f3/image.JPG" -> [f1::f2::f3])',
 }
 
 # Note items that we can import into that are not note fields
@@ -110,11 +110,11 @@ def doMediaImport():
                     data = fileName
                 elif fieldAction == "Extension":
                     data = ext
-                elif fieldAction == "Extension-1":
+                elif fieldAction == "Extension (case-sensitive)":
                     data = os.path.splitext(mediaName)[1][1:]
                 elif fieldAction == "Sequence":
                     data = str(i)
-                elif fieldAction == "Folder tags":
+                elif fieldAction == "Folder tags (individual)":
                     relative_path = os.path.relpath(root, path)
                     data = relative_path.split(os.sep)
                     if "." in data:

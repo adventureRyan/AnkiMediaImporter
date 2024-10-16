@@ -9,7 +9,7 @@ This add-on is an updated version of the [Media Import](https://ankiweb.net/shar
 
 ---
 
-This add-on will allow you to import media files into your Anki collection and use their file names as a component of the note. You can create cards that might look like this (using *apple.jpg*):
+This add-on allows you to import media files into your Anki collection and use their file or folder names as a component of the note. You can create cards that might look like this (using `apple.jpg`):
 
 ![Card](https://raw.githubusercontent.com/Iksas/media-import-2/master/docs/card.png)
 
@@ -17,23 +17,25 @@ When the add-on is installed, a `Media Import 2...` option will be added to the 
 
 ![Menu](https://raw.githubusercontent.com/Iksas/media-import-2/master/docs/menu.png)
 
-Selecting this menu item will open the Media Import window.
+Selecting this menu item will open the Media Import 2 window.
 
 ![Dialog](https://raw.githubusercontent.com/Iksas/media-import-2/master/docs/dialog.png)
 
 From this window, you are able to:
 - Browse and select which folder to use as the source of media files
+  - Subdirectories will be imported as well if the "Subdirectories" checkbox is activated
 - Choose which note type to use for the imported notes
 - Decide what content to put into each of the fields
  
-Here is a list of the content available to insert into fields. We will use an example file named `apple.jpg`.
- - Media - The media file itself (image or audio will appear on the card)
- - File Name - The name of the file without the extension (*apple*)
- - File Name (full) - The name of the file including the extention (*apple.jpg*)
- - Extension - Only the extension of the file (*jpg*)
- - Sequence - A number indicating the order in which the file was imported. If 15 files were imported, each file will contain a value starting from 0 to 14.
-
-
+Here is a list of the content available to insert into fields. We will use an example file located at `./f1/f2/apple.JPG`.
+- Media - The media file itself (image or audio will appear on the card)
+- File Name - The name of the file without the extension (`apple`)
+- File Name (full) - The name of the file including the extention (`apple.JPG`)
+- Extension - Only the lower-case extension of the file (`jpg`)
+- Extension (case-sensitive) - Only the original extension of the file (`JPG`)
+- Sequence - A number indicating the order in which the file was imported. If 15 files were imported, each file will contain a value starting from 0 to 14. Always starts over from 0 for each import.
+- Folder tags (individual) - Creates a separate tag for each subfolder (`f1` and `f2`). If this option is used in a normal field, the tags are combined with spaces (`t1 t2`) Requires the "Subfolders" checkbox to be active.
+- Folder tags (hierarchical) - Creates a combined tag for the subfolder hierarchy (`t1::t2`). Requires the "Subfolders" checkbox to be active.
 
 
 All new generated cards are added to a deck named `MediaImport`. This deck is created for you automatically if it doesn't exist.
