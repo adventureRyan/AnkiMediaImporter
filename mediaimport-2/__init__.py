@@ -235,6 +235,9 @@ class ImportSettingsDialog(QDialog):
 
         # Add the actions to the dropdown menu, and add tooltips
         for i, actionText in enumerate(ACTIONS):
+            # Tags cannot store media
+            if name == "Tags" and actionText == "Media":
+                continue
             cmb.addItem(actionText)
             if actionText in ACTION_TOOLTIPS:
                 cmb.setItemData(i, ACTION_TOOLTIPS[actionText], QtCore.Qt.ItemDataRole.ToolTipRole)
