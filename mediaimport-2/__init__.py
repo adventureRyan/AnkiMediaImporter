@@ -59,6 +59,8 @@ ACTION_TOOLTIPS = {
 # Note items that we can import into that are not note fields
 SPECIAL_FIELDS = ["Tags"]
 
+# Stores the recent path for the file picker
+MEDIA_IMPORT_2_RECENT_PATH = os.path.expanduser("~")
 
 def doMediaImport():
     # Raise the main dialog for the add-on and retrieve its result when closed.
@@ -278,10 +280,14 @@ class ImportSettingsDialog(QDialog):
 
     def onBrowse(self):
         """Show the file picker."""
-        path = QFileDialog.getExistingDirectory(mw, "Import Folder")
+        global MEDIA_IMPORT_2_RECENT_PATH
+
+        path = QFileDialog.getExistingDirectory(mw, caption="Import Folder", directory=MEDIA_IMPORT_2_RECENT_PATH)
         if not path:
             return
         self.mediaDir = path
+        # store the parent directory of the recently selected folder
+        MEDIA_IMPORT_2_RECENT_PATH = os.path.abspath(os.path.join(path, os.pardir))
         self.form.mediaDir.setText(self.mediaDir)
         self.form.mediaDir.setStyleSheet("")
 
