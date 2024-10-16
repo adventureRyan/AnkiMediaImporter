@@ -316,8 +316,8 @@ Media import is complete and %s new notes were created.
 All generated cards are placed in the <b>MediaImport</b> deck.
 <br><br>
 Please refer to the introductory videos for instructions on
-<a href="https://youtube.com/watch?v=DnbKwHEQ1mA">flipping card content</a> or
-<a href="http://youtube.com/watch?v=F1j1Zx0mXME">modifying the appearance of cards.</a>
+<a href="https://www.youtube.com/watch?v=DnbKwHEQ1mA">flipping card content</a> or
+<a href="https://www.youtube.com/watch?v=F1j1Zx0mXME">modifying the appearance of cards.</a>
 </p>"""
         % newCount,
     )
@@ -331,7 +331,7 @@ def showFailureDialog():
 <p>
 Failed to generate cards and no media files were imported. Please ensure the
 note type you selected is able to generate cards by using a valid
-<a href="http://ankisrs.net/docs/manual.html#cards-and-templates">card template</a>.
+<a href="https://docs.ankiweb.net/templates/intro.html">card template</a>.
 </p>
 """,
     )

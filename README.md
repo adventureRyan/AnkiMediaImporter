@@ -28,14 +28,14 @@ From this window, you are able to:
 - Decide what content to put into each of the fields
  
 Here is a list of the content available to insert into fields (with an example file located at `./f1/f2/apple.JPG`):
-- *Media* - The media file itself (image or audio will appear on the card)
-- *File Name* - The name of the file without the extension (`apple`)
-- *File Name (full)* - The name of the file including the extention (`apple.JPG`)
-- *Extension* - Only the lower-case extension of the file (`jpg`)
-- *Extension (case-sensitive)* - Only the original extension of the file (`JPG`)
-- *Sequence* - A number indicating the order in which the file was imported. If 15 files were imported, each file will contain a value starting from 0 to 14. Always starts over from 0 for each import.
-- *Subfolder tags (individual)* - Creates separate tags for each subfolder (`f1` and `f2`). If this option is used in a normal field, the tags are combined with spaces (`t1 t2`) Requires the "Include subfolders" checkbox to be active.
-- *Subfolder tags (hierarchical)* - Creates a combined tag for the subfolder hierarchy (`t1::t2`). Requires the "Include subfolders" checkbox to be active.
+- **Media** - The media file itself (image or audio will appear on the card)
+- **File Name** - The name of the file without the extension (`apple`)
+- **File Name (full)** - The name of the file including the extension (`apple.JPG`)
+- **Extension** - Only the lower-case extension of the file (`jpg`)
+- **Extension (case-sensitive)** - Only the original extension of the file (`JPG`)
+- **Sequence** - A number indicating the order in which the file was imported. If 15 files were imported, each file will contain a value starting from 0 to 14. Always starts over from 0 for each import.
+- **Subfolder tags (individual)** - Creates separate tags for each subfolder (`f1` and `f2`). If this option is used in a normal field, the tags are combined with spaces (`t1 t2`) Requires the "Include subfolders" checkbox to be active.
+- **Subfolder tags (hierarchical)** - Creates a combined tag for the subfolder hierarchy (`t1::t2`). Requires the "Include subfolders" checkbox to be active.
 
 
 All new generated cards are added to a deck named `MediaImport`. This deck is created for you automatically if it doesn't exist.
