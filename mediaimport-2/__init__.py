@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Version: 3.1
+# Version: 3.1.1
 #
 # This is an Anki add-on for creating notes by importing media files from a
 # user-selected folder. The user is able to map properties of the imported
@@ -19,9 +19,9 @@ from aqt.qt import *
 from anki import notes
 
 try:
-    from PyQt5 import QtCore
-except ModuleNotFoundError:
     from PyQt6 import QtCore
+except ImportError:
+    from PyQt5 import QtCore
 
 from . import dialog
 

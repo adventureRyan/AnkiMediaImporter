@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Version: 3.1
+# Version: 3.1.1
 #
 # This is an Anki add-on for creating notes by importing media files from a
 # user-selected directory. The user is able to map properties of the imported
@@ -12,9 +12,9 @@
 # https://github.com/Iksas/media-import-2
 
 try:
-    from PyQt5 import QtCore, QtGui, QtWidgets
-except ModuleNotFoundError:
     from PyQt6 import QtCore, QtGui, QtWidgets
+except ImportError:
+    from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_Form(object):
