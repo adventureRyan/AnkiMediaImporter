@@ -4,7 +4,7 @@
 # This is an Anki add-on for creating notes by importing media files from a
 # user-selected folder. The user is able to map properties of the imported
 # file to fields in a note type. For example, a user can map the media file
-# to the 'Front' field and the file name to the 'Back' field and generate new
+# to the 'Front' field and the Question to the 'Back' field and generate new
 # cards from a folder of media files following this pattern. It can create
 # decks recursively and with a hierarchical tag structure.
 #
@@ -32,9 +32,9 @@ IMAGE = editor.pics
 # Possible field mappings
 ACTIONS = [
     "",
+    "Question",
+    "Explain",
     "Media",
-    "File Name",
-    "File Name (full)",
     "Extension",
     "Extension (case-sensitive)",
     "Sequence",
@@ -47,8 +47,8 @@ ACTIONS = [
 ACTION_TOOLTIPS = {
     "": "Nothing",
     "Media": "The media file\n(image / audio etc.)",
-    "File Name": 'The file name without extension\n(e.g. "image.JPG" -> "image")',
-    "File Name (full)": 'The file name with extension\n(e.g. "image.JPG" -> "image.JPG")',
+    "Question": 'The Question without extension\n(e.g. "image.JPG" -> "image")',
+    "Explain": 'The Question with extension\n(e.g. "image.JPG" -> "image.JPG")',
     "Extension": 'The lower-case file extension\n(e.g. "image.JPG" -> "jpg")',
     "Extension (case-sensitive)": 'The file extension\n(e.g. "image.JPG" -> "JPG")',
     "Sequence": 'An increasing number\n("0", "1", "2", ...)',
@@ -78,6 +78,23 @@ def doMediaImport():
     fileCount = sum([len(files) for _, _, files in os.walk(path)])
     mw.progress.start(max=fileCount, parent=mw, immediate=True)
 
+    first_root = next(os.walk(path))[0]
+    # define the file name
+    txtname = 'main.txt'
+    txtname = os.path.join(first_root, txtname)
+    with open(txtname, 'r', encoding='utf-8') as file:
+        content = file.read()
+    # split the content into sections
+    sections = content.split('\n\n')
+    first_list = []
+    second_list = []
+    for section in sections:
+        # split each section into lines
+        lines = section.strip().split('\n')
+        if len(lines) >= 2:
+            first_list.append(lines[0].strip())
+            second_list.append(lines[1].strip())
+
     for root, dirs, files in os.walk(path):
         # Don't import subfolders if the user disabled them
         if not recursive:
@@ -98,6 +115,11 @@ def doMediaImport():
             for field, actionText, special in fieldList:
                 if actionText == "":
                     continue
+                elif actionText == "Question":
+                    # data = mediaName
+                    data = first_list[i-1]
+                elif actionText == "Explain":
+                    data = second_list[i-1]
                 elif actionText == "Media":
                     if ext in AUDIO:
                         data = "[sound:%s]" % internalFileName
@@ -105,10 +127,6 @@ def doMediaImport():
                         data = '<img src="%s">' % internalFileName
                     else:
                         continue
-                elif actionText == "File Name":
-                    data = mediaName
-                elif actionText == "File Name (full)":
-                    data = fileName
                 elif actionText == "Extension":
                     data = ext
                 elif actionText == "Extension (case-sensitive)":
@@ -198,7 +216,7 @@ class ImportSettingsDialog(QDialog):
         Each row in the grid contains two columns:
         Column 0 = QLabel with name of field
         Column 1 = QComboBox with selection of mappings ("actions")
-        The first two fields will default to Media and File Name, so we have
+        The first two fields will default to Media and Question, so we have
         special cases for rows 0 and 1. The final row is a spacer."""
 
         self.clearLayout(self.form.fieldMapGrid)
@@ -249,6 +267,8 @@ class ImportSettingsDialog(QDialog):
             cmb.setCurrentIndex(1)
         if idx == 1:
             cmb.setCurrentIndex(2)
+        if idx == 2:
+            cmb.setCurrentIndex(3)
 
     def getDialogResult(self):
         """Return a tuple containing the user-defined settings to follow
