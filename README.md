@@ -42,10 +42,10 @@ Here is a list of the content available to insert into fields (with an example f
 1. Create a new folder and add a `main.txt` file inside it.
 
 2. Place the images you need to import into the folder.
-   https://github.com/adventureRyan/AnkiMediaImporter/blob/master/docs/folder.png
+   ![folder](https://github.com/adventureRyan/AnkiMediaImporter/blob/master/docs/folder.png)
 
 3. Edit the  `main.txt` file according to the following format.
-   https://github.com/adventureRyan/AnkiMediaImporter/blob/master/docs/txt.png
+   ![txt](https://github.com/adventureRyan/AnkiMediaImporter/blob/master/docs/txt.png)
 
 4. Import them into Anki and you can see the following effect.
-   https://github.com/adventureRyan/AnkiMediaImporter/blob/master/docs/result.png
+   ![result](https://github.com/adventureRyan/AnkiMediaImporter/blob/master/docs/result.png)
