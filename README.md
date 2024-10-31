@@ -3,8 +3,6 @@ AnkiMediaImporter
 
 Anki add-on for importing media files as new notes.
 
-[Link to add-on](https://ankiweb.net/shared/info/129299120)
-
 This add-on is an updated version of the [Media Import](https://ankiweb.net/shared/info/1531997860) add-on, which is no longer being maintained.
 
 ---
@@ -31,14 +29,22 @@ From this window, you are able to:
 Here is a list of the content available to insert into fields (with an example file located at `./f1/f2/apple.JPG`):
 
 - **Media** - The media file itself (image or audio will appear on the card)
-- **File Name** - The name of the file without the extension (`apple`)
-- **File Name (full)** - The name of the file including the extension (`apple.JPG`)
+- **Question** - The first line of the txt.
+- **Explain** - The second line txt.
 - **Extension** - Only the lower-case extension of the file (`jpg`)
 - **Extension (case-sensitive)** - Only the original extension of the file (`JPG`)
 - **Sequence** - A number indicating the order in which the file was imported. If 15 files were imported, each file will contain a value starting from 0 to 14. Always starts over from 0 for each import.
 - **Subfolder tags (individual)** - Creates separate tags for each subfolder (`f1` and `f2`). If this option is used in a non-tag field, the names are combined with spaces (`t1 t2`). Requires the "Include subfolders" checkbox to be active.
 - **Subfolder tag (hierarchical)** - Creates a single, hierarchical tag for the subfolder hierarchy (`t1::t2`). Requires the "Include subfolders" checkbox to be active.
 
-All new generated cards are added to a deck named `MediaImport`. This deck is created for you automatically if it doesn't exist.
 
-![Complete](https://raw.githubusercontent.com/Iksas/media-import-2/master/docs/complete.png)
+
+## How to Use
+
+1. Create a new folder and add a `main.txt` file inside it.
+
+2. Place the images you need to import into the folder.
+
+3. Edit the  `main.txt` file according to the following format.
+
+4. Import them into Anki and you can see the following effect.
