@@ -37,14 +37,15 @@ Here is a list of the content available to insert into fields (with an example f
 - **Subfolder tags (individual)** - Creates separate tags for each subfolder (`f1` and `f2`). If this option is used in a non-tag field, the names are combined with spaces (`t1 t2`). Requires the "Include subfolders" checkbox to be active.
 - **Subfolder tag (hierarchical)** - Creates a single, hierarchical tag for the subfolder hierarchy (`t1::t2`). Requires the "Include subfolders" checkbox to be active.
 
-
-
 ## How to Use
 
 1. Create a new folder and add a `main.txt` file inside it.
 
 2. Place the images you need to import into the folder.
+   https://github.com/adventureRyan/AnkiMediaImporter/blob/master/docs/folder.png
 
 3. Edit the  `main.txt` file according to the following format.
+   https://github.com/adventureRyan/AnkiMediaImporter/blob/master/docs/txt.png
 
 4. Import them into Anki and you can see the following effect.
+   https://github.com/adventureRyan/AnkiMediaImporter/blob/master/docs/result.png
